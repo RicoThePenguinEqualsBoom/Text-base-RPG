@@ -12,15 +12,15 @@
 
         public int ID { get; set; }
         public int MaxDamage { get; set; }
-        public int RewardExperiencePoints { get; set; }
+        public int RewardExP { get; set; }
         public List<LootItems> LootTable { get; set; }
 
-        public Monsters(int currentHitPoints, int maxHitPoints, int id, int maxDamage, int rewardExperiencePoints, string name,
-            string description) : base(currentHitPoints, maxHitPoints, name, description)
+        public Monsters(int currentHP, int maxHP, int id, int maxDamage, int rewardExP, string name,
+            string description) : base(currentHP, maxHP, name, description)
         {
             ID = id;
             MaxDamage = maxDamage;
-            RewardExperiencePoints = rewardExperiencePoints;
+            RewardExP = rewardExP;
             Name = name;
             LootTable = [];
         }

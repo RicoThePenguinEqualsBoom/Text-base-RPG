@@ -7,6 +7,11 @@
         public static readonly List<Quests> Quests = [];
         public static readonly List<Locations> Locations = [];
 
+        public const Items missingIt = null;
+        public const Monsters missingMo = null;
+        public const Quests missingQu = null;
+        public const Locations missingLo = null;
+
         public const int ITEM_ID_RUSTY_SWORD = 1;
         public const int ITEM_ID_RAT_TAIL = 2;
         public const int ITEM_ID_PIECE_OF_FUR = 3;
@@ -185,7 +190,7 @@
                 }
             }
 
-            return null;
+            return missingIt;
         }
 
         public static Monsters MonsterByID(int id)
@@ -198,7 +203,7 @@
                 }
             }
 
-            return null;
+            return missingMo;
         }
 
         public static Quests QuestByID(int id)
@@ -210,7 +215,7 @@
                     return quest;
                 }
             }
-            return null;
+            return missingQu;
         }
 
         public static Locations LocationById(int id)
@@ -223,7 +228,7 @@
                 }
             }
 
-            return null;
+            return missingLo;
         }
     }
 }

@@ -32,10 +32,10 @@
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
-            lblHitPoints = new Label();
+            lblHP = new Label();
             lblGold = new Label();
-            lblExperience = new Label();
-            lblLevel = new Label();
+            lblExP = new Label();
+            lblLvl = new Label();
             label5 = new Label();
             weaponBox = new ComboBox();
             potionBox = new ComboBox();
@@ -89,13 +89,13 @@
             label4.TabIndex = 3;
             label4.Text = "Level:";
             // 
-            // lblHitPoints
+            // lblHP
             // 
-            lblHitPoints.AutoSize = true;
-            lblHitPoints.Location = new Point(110, 19);
-            lblHitPoints.Name = "lblHitPoints";
-            lblHitPoints.Size = new Size(0, 15);
-            lblHitPoints.TabIndex = 4;
+            lblHP.AutoSize = true;
+            lblHP.Location = new Point(110, 19);
+            lblHP.Name = "lblHP";
+            lblHP.Size = new Size(0, 15);
+            lblHP.TabIndex = 4;
             // 
             // lblGold
             // 
@@ -105,21 +105,21 @@
             lblGold.Size = new Size(0, 15);
             lblGold.TabIndex = 5;
             // 
-            // lblExperience
+            // lblExP
             // 
-            lblExperience.AutoSize = true;
-            lblExperience.Location = new Point(110, 73);
-            lblExperience.Name = "lblExperience";
-            lblExperience.Size = new Size(0, 15);
-            lblExperience.TabIndex = 6;
+            lblExP.AutoSize = true;
+            lblExP.Location = new Point(110, 73);
+            lblExP.Name = "lblExP";
+            lblExP.Size = new Size(0, 15);
+            lblExP.TabIndex = 6;
             // 
-            // lblLevel
+            // lblLvl
             // 
-            lblLevel.AutoSize = true;
-            lblLevel.Location = new Point(110, 99);
-            lblLevel.Name = "lblLevel";
-            lblLevel.Size = new Size(0, 15);
-            lblLevel.TabIndex = 7;
+            lblLvl.AutoSize = true;
+            lblLvl.Location = new Point(110, 99);
+            lblLvl.Name = "lblLvl";
+            lblLvl.Size = new Size(0, 15);
+            lblLvl.TabIndex = 7;
             // 
             // label5
             // 
@@ -274,10 +274,10 @@
             Controls.Add(potionBox);
             Controls.Add(weaponBox);
             Controls.Add(label5);
-            Controls.Add(lblLevel);
-            Controls.Add(lblExperience);
+            Controls.Add(lblLvl);
+            Controls.Add(lblExP);
             Controls.Add(lblGold);
-            Controls.Add(lblHitPoints);
+            Controls.Add(lblHP);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -296,10 +296,10 @@
         private Label label2;
         private Label label3;
         private Label label4;
-        private Label lblHitPoints;
+        private Label lblHP;
         private Label lblGold;
-        private Label lblExperience;
-        private Label lblLevel;
+        private Label lblExP;
+        private Label lblLvl;
         private Label label5;
         private ComboBox weaponBox;
         private ComboBox potionBox;
