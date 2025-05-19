@@ -6,21 +6,18 @@ namespace SuperAdventure
 {
     public partial class SuperAdventure : Form
     {
-        private Player _player;
+        private readonly Player _player;
         private Monsters _currentMonster;
 
         public SuperAdventure()
         {
             InitializeComponent();
 
-            _player = new Player(10, 10, 20, 0, 1, "name", "You are you, nothing more, nothing less.");
+            _player = new Player(10, 10, 20, 0, "name", "You are you, nothing more, nothing less.");
             MoveTo(World.LocationById(World.LOCATION_ID_HOME));
             _player.Inventory.Add(new InventoryItems(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
 
-            lblHP.Text = _player.CurrentHP.ToString();
-            lblGold.Text = _player.Gold.ToString();
-            lblExP.Text = _player.ExP.ToString();
-            lblLvl.Text = _player.Lvl.ToString();
+            UpdatePlayerStats();
         }
 
         private void btnNorth_Click(object sender, EventArgs e)
@@ -62,9 +59,9 @@ namespace SuperAdventure
             rtbLocation.Text = newLocation.Name + Environment.NewLine;
             rtbLocation.Text += newLocation.Description + Environment.NewLine;
 
-            _player.CurrentHP= _player.MaxHP;
+            _player.CurrentHP = _player.MaxHP;
 
-            lblHP.Text = _player.CurrentHP.ToString();
+            UpdatePlayerStats();
 
             if (newLocation.QuestsAvailableHere != null)
             {
@@ -158,12 +155,11 @@ namespace SuperAdventure
             }
 
             UpdateInventoryList();
-
             UpdateQuestList();
-
             UpdateWeaponList();
-
             UpdatePotionList();
+            UpdatePlayerStats();
+            BottomOut();
         }
 
         private void UpdateInventoryList()
@@ -193,13 +189,13 @@ namespace SuperAdventure
             dgvQuests.ColumnCount = 2;
             dgvQuests.Columns[0].Name = "Name";
             dgvQuests.Columns[0].Width = 197;
-            dgvQuests.Columns[1].Name = "Done?";
+            dgvQuests.Columns[1].Name = "State";
 
             dgvQuests.Rows.Clear();
 
             foreach (PlayerQuests pq in _player.Quests)
             {
-                dgvQuests.Rows.Add([pq.Details.Name, pq.IsCompleted.ToString()]);
+                dgvQuests.Rows.Add([pq.Details.Name, pq.State]);
             }
         }
 
@@ -263,6 +259,14 @@ namespace SuperAdventure
             }
         }
 
+        private void UpdatePlayerStats()
+        {
+            lblHP.Text = _player.CurrentHP.ToString();
+            lblGold.Text = _player.Gold.ToString();
+            lblExP.Text = _player.ExP.ToString();
+            lblLvl.Text = _player.Lvl.ToString();
+        }
+
         private void btnUseWeapon_Click(object sender, EventArgs e)
         {
             Weapons currentWeapon = (Weapons)weaponBox.SelectedItem;
@@ -319,17 +323,15 @@ namespace SuperAdventure
                     }
                 }
 
-                lblHP.Text = _player.CurrentHP.ToString();
-                lblGold.Text = _player.Gold.ToString();
-                lblExP.Text = _player.ExP.ToString();
-                lblLvl.Text = _player.Lvl.ToString();
-
+                UpdatePlayerStats();
                 UpdateInventoryList();
                 UpdatePotionList();
 
                 rtbMessages.Text += Environment.NewLine;
 
                 MoveTo(_player.CurrentLocation);
+
+                BottomOut();
             }
             else
             {
@@ -340,7 +342,7 @@ namespace SuperAdventure
 
                 _player.CurrentHP -= damageToPlayer;
 
-                lblHP.Text = _player.CurrentHP.ToString();
+                UpdatePlayerStats();
 
                 if(_player.CurrentHP <= 0)
                 {
@@ -348,6 +350,8 @@ namespace SuperAdventure
                     MoveTo(World.LocationById(World.LOCATION_ID_HOME));
                     rtbMessages.Text += "A kind stranger must have brought you home." + Environment.NewLine;
                 }
+
+                BottomOut();
             }
         }
 
@@ -371,7 +375,8 @@ namespace SuperAdventure
                 }
             }
 
-            rtbMessages.Text += "You drink a " + potion.Name + Environment.NewLine;
+            rtbMessages.Text += "You drink a " + potion.Name + " and recover " + potion.AmountToHeal + " health." +
+                Environment.NewLine;
 
             int damageToPlayer = RNG.NumberBetween(1, _currentMonster.MaxDamage);
 
@@ -380,8 +385,6 @@ namespace SuperAdventure
 
             _player.CurrentHP -= damageToPlayer;
 
-            lblHP.Text = _player.CurrentHP.ToString();
-
             if (_player.CurrentHP <= 0)
             {
                 rtbMessages.Text += "The " + _currentMonster.Name + " knocked you out." + Environment.NewLine;
@@ -389,8 +392,16 @@ namespace SuperAdventure
                 rtbMessages.Text += "A kind stranger must have brought you home." + Environment.NewLine;
             }
 
+            UpdatePlayerStats();
             UpdateInventoryList();
             UpdatePotionList();
+            BottomOut();
+        }
+
+        private void BottomOut()
+        {
+            rtbMessages.SelectionStart = rtbMessages.Text.Length;
+            rtbMessages.ScrollToCaret();
         }
     }
 }

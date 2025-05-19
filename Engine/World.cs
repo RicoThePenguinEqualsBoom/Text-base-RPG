@@ -96,7 +96,7 @@
         private static void PopulateQuests()
         {
             Quests clearAlchemistGarden = new(QUEST_ID_CLEAR_ALCHEMIST_GARDEN, 20, 10, "Clear the alchemist's" +
-                " garden", "Kill rats in the alchemist's garden and bring back 3 rat tails. You will receive a healing potion" +
+                " garden", "Kill rats in the alchemist's garden. You will receive a healing potion" +
                 " and 20 gold pieces as a reward.");
 
             clearAlchemistGarden.QuestCompletionItems.Add(new QuestCompletionItems(3, ItemByID(ITEM_ID_RAT_TAIL)));
@@ -104,7 +104,7 @@
             clearAlchemistGarden.RewardItems = ItemByID(ITEM_ID_HEALING_POTION);
 
             Quests clearFarmersField = new(QUEST_ID_CLEAR_FARMERS_FIELD, 20, 20, "Clear the farmer's field",
-                "Kill snakes in the farmer's field and bring back 3 snake fangs. You will receive an adventurer's pass and" +
+                "Kill snakes in the farmer's field. You will receive an adventurer's pass and" +
                 " 20 gold pieces as a reward.");
 
             clearFarmersField.QuestCompletionItems.Add(new QuestCompletionItems(3, ItemByID(ITEM_ID_SNAKE_FANG)));
@@ -123,17 +123,29 @@
             Locations townSquare = new(LOCATION_ID_TOWN_SQUARE, "Town square", "You see a fountain people busting.");
 
             Locations alchemistHut = new(LOCATION_ID_ALCHEMIST_HUT, "Alchemist's hut", "There are many strange plants" +
-                " and herbs on the shelves.");
+                " and herbs on the shelves.")
+            {
+                QuestsAvailableHere = QuestByID(QUEST_ID_CLEAR_ALCHEMIST_GARDEN)
+            };
 
             Locations alchemistGarden = new(LOCATION_ID_ALCHEMIST_GARDEN, "Alchemist's garden", "Many unusual plants" +
-                " grow here.");
+                " grow here.")
+            {
+                MonstersLivingHere = MonsterByID(MONSTER_ID_RAT)
+            };
 
             Locations farmhouse = new(LOCATION_ID_FARMHOUSE, "Farmhouse", " There is a small farmhouse," +
-                " with a farmer in front.");
+                " with a farmer in front.")
+            {
+                QuestsAvailableHere = QuestByID(QUEST_ID_CLEAR_FARMERS_FIELD)
+            };
 
-            Locations farmersField = new(LOCATION_ID_FARM_FIELD, "Farmer's field", "You see rows of vegetables sprouting.");
+            Locations farmersField = new(LOCATION_ID_FARM_FIELD, "Farmer's field", "You see rows of vegetables sprouting.")
+            {
+                MonstersLivingHere = MonsterByID(MONSTER_ID_SNAKE)
+            };
 
-            Locations guardPost = new(LOCATION_ID_GUARD_POST, "Guard post", "A, large, tough-looking guard is standing" +
+            Locations guardPost = new(LOCATION_ID_GUARD_POST, "Guard post", "A, large, tough-looking guard is standing " +
                 "here. He looks bored.", ItemByID(ITEM_ID_ADVENTURER_PASS));
 
             Locations bridge = new(LOCATION_ID_BRIDGE, "Bridge", "A stone bridge crosses a large river.");
