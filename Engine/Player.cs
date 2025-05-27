@@ -1,5 +1,6 @@
 ﻿namespace Engine
 {
+    [Serializable]
     public class Player(int currentHP, int maxHP, int gold, int exP, string name,
             string description) : LivingCreatures(currentHP, maxHP, name, description)
     {
@@ -82,15 +83,13 @@
 
         public void QuestCompleted(Quests quest)
         {
-            foreach(PlayerQuests pq in Quests)
+            PlayerQuests playerQuest = Quests.SingleOrDefault(pq => pq.Details.ID == quest.ID);
+            if (playerQuest != null)
             {
-                if(pq.Details.ID == quest.ID)
-                {
-                    pq.IsCompleted = true;
-                    pq.State = "Completed";
+                playerQuest.IsCompleted = true;
+                playerQuest.State = "Completed";
 
-                    return;
-                }
+                return;
             }
         }
     }

@@ -7,7 +7,7 @@ namespace SuperAdventure
     public partial class SuperAdventure : Form
     {
         private readonly Player _player;
-        private Monsters _currentMonster;
+        private Monsters? _currentMonster;
 
         public SuperAdventure()
         {
@@ -346,8 +346,10 @@ namespace SuperAdventure
 
                 if(_player.CurrentHP <= 0)
                 {
+                    rtbMessages.Text += Environment.NewLine;
                     rtbMessages.Text += "The " + _currentMonster.Name + " knocked you out." + Environment.NewLine;
                     MoveTo(World.LocationById(World.LOCATION_ID_HOME));
+                    rtbMessages.Text += Environment.NewLine;
                     rtbMessages.Text += "A kind stranger must have brought you home." + Environment.NewLine;
                 }
 
@@ -387,8 +389,10 @@ namespace SuperAdventure
 
             if (_player.CurrentHP <= 0)
             {
+                rtbMessages.Text += Environment.NewLine;
                 rtbMessages.Text += "The " + _currentMonster.Name + " knocked you out." + Environment.NewLine;
                 MoveTo(World.LocationById(World.LOCATION_ID_HOME));
+                rtbMessages.Text += Environment.NewLine;
                 rtbMessages.Text += "A kind stranger must have brought you home." + Environment.NewLine;
             }
 
