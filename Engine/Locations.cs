@@ -1,17 +1,29 @@
 ﻿namespace Engine
 {
-    public class Locations(int id, string name, string description, Items itemRequiredToEnter = null,
-            Quests questsAvailableHere = null, Monsters monstersLivingHere = null)
+    public class Locations
     {
-        public int ID { get; set; } = id;
-        public string Name { get; set; } = name;
-        public string Description { get; set; } = description;
-        public Items ItemRequiredToEnter { get; set; } = itemRequiredToEnter;
-        public Quests QuestsAvailableHere { get; set; } = questsAvailableHere;
-        public Monsters MonstersLivingHere { get; set; } = monstersLivingHere;
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public Items ItemRequiredToEnter { get; set; }
+        public Quests QuestsAvailableHere { get; set; }
+        public Monsters MonstersLivingHere { get; set; }
         public Locations LocationToNorth { get; set; }
         public Locations LocationToSouth { get; set; }
         public Locations LocationToEast { get; set; }
         public Locations LocationToWest { get; set; }
+
+        public Locations() { }
+
+        public Locations(int id, string name, string description, Items itemRequiredToEnter = null,
+            Quests questsAvailableHere = null, Monsters monstersLivingHere = null)
+        {
+            ID = id;
+            Name = name;
+            Description = description;
+            ItemRequiredToEnter = itemRequiredToEnter;
+            QuestsAvailableHere = questsAvailableHere;
+            MonstersLivingHere = monstersLivingHere;
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace Engine
 
         public static Player Load()
         {
-            if(!File.Exists(SaveFile))
+            if (!File.Exists(SaveFile))
             {
                 return null;
             }
@@ -33,6 +33,14 @@ namespace Engine
 
             string json = File.ReadAllText(SaveFile);
             return JsonSerializer.Deserialize<Player>(json, options);
+        }
+
+        public static void ResetSave()
+        {
+            if (File.Exists(SaveFile))
+            {
+                File.Delete(SaveFile);
+            }
         }
     }
 }

@@ -1,6 +1,4 @@
 using Engine;
-using System.Security.Cryptography;
-using System.Security.Cryptography.Xml;
 
 namespace SuperAdventure
 {
@@ -8,41 +6,64 @@ namespace SuperAdventure
     {
         private readonly Player _player;
         private Monsters? _currentMonster;
+        private MoveTo _moveTo;
 
         public SuperAdventure()
         {
             InitializeComponent();
 
+            rdbtnOff.Checked = true;
+
             _player = new Player(10, 10, 20, 0, "name", "You are you, nothing more, nothing less.");
-            MoveTo(World.LocationById(World.LOCATION_ID_HOME));
+            NoSaveMove(World.LocationById(World.LOCATION_ID_HOME));
             _player.Inventory.Add(new InventoryItems(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
+
+            if (SaveSystem.Load() != null)
+            {
+                _player = SaveSystem.Load();
+                _player.CurrentLocation = World.LocationById(_player.CurrentLocation.ID);
+
+                foreach (var ii in _player.Inventory)
+                {
+                    ii.Details = World.ItemByID(ii.Details.ID);
+                }
+
+                foreach (var pq in _player.Quests)
+                {
+                    pq.Details = World.QuestByID(pq.Details.ID);
+                }
+
+                NoSaveMove(_player.CurrentLocation);
+            }
 
             UpdatePlayerStats();
         }
 
         private void btnNorth_Click(object sender, EventArgs e)
         {
-            MoveTo(_player.CurrentLocation.LocationToNorth);
+            _moveTo(_player.CurrentLocation.LocationToNorth);
         }
 
         private void btnEast_Click(object sender, EventArgs e)
         {
-            MoveTo(_player.CurrentLocation.LocationToEast);
+            _moveTo(_player.CurrentLocation.LocationToEast);
         }
 
         private void btnWest_Click(object sender, EventArgs e)
         {
-            MoveTo(_player.CurrentLocation.LocationToWest);
+            _moveTo(_player.CurrentLocation.LocationToWest);
         }
 
         private void btnSouth_Click(object sender, EventArgs e)
         {
-            MoveTo(_player.CurrentLocation.LocationToSouth);
+            _moveTo(_player.CurrentLocation.LocationToSouth);
         }
 
-        private void MoveTo(Locations newLocation)
+        private delegate void MoveTo(Locations newLocation);
+
+        private void NoSaveMove(Locations newLocation)
         {
-            if(!_player.HasRequiredItemToEnter(newLocation))
+            if (!_player.HasRequiredItemToEnter(newLocation))
             {
                 rtbMessages.Text += "You must have a " + newLocation.ItemRequiredToEnter.Name + " to enter this " +
                     "location." + Environment.NewLine;
@@ -90,7 +111,7 @@ namespace SuperAdventure
                             rtbMessages.Text += newLocation.QuestsAvailableHere.RewardItems.Name + Environment.NewLine;
                             rtbMessages.Text += Environment.NewLine;
 
-                            _player.ExP+= newLocation.QuestsAvailableHere.RewardExP;
+                            _player.ExP += newLocation.QuestsAvailableHere.RewardExP;
                             _player.Gold += newLocation.QuestsAvailableHere.RewardGold;
 
                             _player.AddItemToInventory(newLocation.QuestsAvailableHere.RewardItems);
@@ -161,6 +182,130 @@ namespace SuperAdventure
             UpdatePlayerStats();
             BottomOut();
         }
+
+        private void AutoSaveMove(Locations newLocation)
+        {
+            if (!_player.HasRequiredItemToEnter(newLocation))
+            {
+                rtbMessages.Text += "You must have a " + newLocation.ItemRequiredToEnter.Name + " to enter this " +
+                    "location." + Environment.NewLine;
+                return;
+            }
+
+            _player.CurrentLocation = newLocation;
+
+            btnNorth.Visible = newLocation.LocationToNorth != null;
+            btnEast.Visible = newLocation.LocationToEast != null;
+            btnWest.Visible = newLocation.LocationToWest != null;
+            btnSouth.Visible = newLocation.LocationToSouth != null;
+
+            rtbLocation.Text = newLocation.Name + Environment.NewLine;
+            rtbLocation.Text += newLocation.Description + Environment.NewLine;
+
+            _player.CurrentHP = _player.MaxHP;
+
+            UpdatePlayerStats();
+
+            if (newLocation.QuestsAvailableHere != null)
+            {
+                bool playerAlreadyHasQuest = _player.HasQuest(newLocation.QuestsAvailableHere);
+                bool playerAlreadyCompletedQuest = _player.CompletedQuest(newLocation.QuestsAvailableHere);
+
+                if (playerAlreadyHasQuest)
+                {
+                    if (!playerAlreadyCompletedQuest)
+                    {
+                        bool playerHasQuestItems = _player.HasQuestItems(newLocation.QuestsAvailableHere);
+
+                        if (playerHasQuestItems)
+                        {
+                            rtbMessages.Text += Environment.NewLine;
+                            rtbMessages.Text += "You completed the " + newLocation.QuestsAvailableHere.Name + " quest!" +
+                                Environment.NewLine;
+
+                            _player.RemoveQuestItems(newLocation.QuestsAvailableHere);
+
+                            rtbMessages.Text += "You receive: " + Environment.NewLine;
+                            rtbMessages.Text += newLocation.QuestsAvailableHere.RewardExP.ToString() +
+                                " experience points" + Environment.NewLine;
+                            rtbMessages.Text += newLocation.QuestsAvailableHere.RewardGold.ToString() + " gold" +
+                                Environment.NewLine;
+                            rtbMessages.Text += newLocation.QuestsAvailableHere.RewardItems.Name + Environment.NewLine;
+                            rtbMessages.Text += Environment.NewLine;
+
+                            _player.ExP += newLocation.QuestsAvailableHere.RewardExP;
+                            _player.Gold += newLocation.QuestsAvailableHere.RewardGold;
+
+                            _player.AddItemToInventory(newLocation.QuestsAvailableHere.RewardItems);
+
+                            _player.QuestCompleted(newLocation.QuestsAvailableHere);
+                        }
+                    }
+                }
+                else
+                {
+                    rtbMessages.Text += "You receive the " + newLocation.QuestsAvailableHere.Name + " quest!" +
+                        Environment.NewLine;
+                    rtbMessages.Text += newLocation.QuestsAvailableHere.Description + Environment.NewLine;
+                    rtbMessages.Text += "To complete it, return with:" + Environment.NewLine;
+
+                    foreach (QuestCompletionItems qci in newLocation.QuestsAvailableHere.QuestCompletionItems)
+                    {
+                        if (qci.Quantity == 1)
+                        {
+                            rtbMessages.Text += qci.Quantity.ToString() + " " + qci.Details.Name + Environment.NewLine;
+                        }
+                        else
+                        {
+                            rtbMessages.Text += qci.Quantity.ToString() + " " + qci.Details.NamePlural + Environment.NewLine;
+                        }
+                    }
+
+                    rtbMessages.Text += Environment.NewLine;
+
+                    _player.Quests.Add(new PlayerQuests(newLocation.QuestsAvailableHere));
+                }
+            }
+
+            if (newLocation.MonstersLivingHere != null)
+            {
+                rtbMessages.Text += "You see a " + newLocation.MonstersLivingHere.Name + Environment.NewLine;
+
+                Monsters standardMonster = World.MonsterByID(newLocation.MonstersLivingHere.ID);
+
+                _currentMonster = new Monsters(standardMonster.CurrentHP, standardMonster.MaxHP,
+                    standardMonster.ID, standardMonster.MaxDamage, standardMonster.RewardExP,
+                    standardMonster.Name, standardMonster.Description);
+
+                foreach (LootItems lootItem in standardMonster.LootTable)
+                {
+                    _currentMonster.LootTable.Add(lootItem);
+                }
+
+                weaponBox.Visible = true;
+                potionBox.Visible = true;
+                btnUseWeapon.Visible = true;
+                btnUsePotion.Visible = true;
+            }
+            else
+            {
+                _currentMonster = null;
+
+                weaponBox.Visible = false;
+                potionBox.Visible = false;
+                btnUseWeapon.Visible = false;
+                btnUsePotion.Visible = false;
+            }
+
+            UpdateInventoryList();
+            UpdateQuestList();
+            UpdateWeaponList();
+            UpdatePotionList();
+            UpdatePlayerStats();
+            SaveSystem.Save(_player);
+            BottomOut();
+        }
+
 
         private void UpdateInventoryList()
         {
@@ -278,7 +423,7 @@ namespace SuperAdventure
             rtbMessages.Text += "You hit the " + _currentMonster.Name + " for " +
                 damageToMonster.ToString() + " damage." + Environment.NewLine;
 
-            if(_currentMonster.CurrentHP <= 0)
+            if (_currentMonster.CurrentHP <= 0)
             {
                 rtbMessages.Text += Environment.NewLine;
                 rtbMessages.Text += "You defeated the " + _currentMonster.Name + Environment.NewLine;
@@ -289,30 +434,30 @@ namespace SuperAdventure
 
                 List<InventoryItems> lootedItems = [];
 
-                foreach(LootItems lootItem in _currentMonster.LootTable)
+                foreach (LootItems lootItem in _currentMonster.LootTable)
                 {
-                    if(RNG.NumberBetween(1, 100) <= lootItem.DropChance)
+                    if (RNG.NumberBetween(1, 100) <= lootItem.DropChance)
                     {
                         lootedItems.Add(new InventoryItems(lootItem.Details, 1));
                     }
                 }
 
-                if(lootedItems.Count == 0)
+                if (lootedItems.Count == 0)
                 {
-                    foreach(LootItems lootItem in _currentMonster.LootTable)
+                    foreach (LootItems lootItem in _currentMonster.LootTable)
                     {
-                        if(lootItem.IsDefaultItem)
+                        if (lootItem.IsDefaultItem)
                         {
                             lootedItems.Add(new InventoryItems(lootItem.Details, 1));
                         }
                     }
                 }
 
-                foreach(InventoryItems ii in lootedItems)
+                foreach (InventoryItems ii in lootedItems)
                 {
                     _player.AddItemToInventory(ii.Details);
 
-                    if(ii.Quantity == 1)
+                    if (ii.Quantity == 1)
                     {
                         rtbMessages.Text += "You looted a " + ii.Details.Name + Environment.NewLine;
                     }
@@ -329,7 +474,7 @@ namespace SuperAdventure
 
                 rtbMessages.Text += Environment.NewLine;
 
-                MoveTo(_player.CurrentLocation);
+                _moveTo(_player.CurrentLocation);
 
                 BottomOut();
             }
@@ -344,11 +489,11 @@ namespace SuperAdventure
 
                 UpdatePlayerStats();
 
-                if(_player.CurrentHP <= 0)
+                if (_player.CurrentHP <= 0)
                 {
                     rtbMessages.Text += Environment.NewLine;
                     rtbMessages.Text += "The " + _currentMonster.Name + " knocked you out." + Environment.NewLine;
-                    MoveTo(World.LocationById(World.LOCATION_ID_HOME));
+                    _moveTo(World.LocationById(World.LOCATION_ID_HOME));
                     rtbMessages.Text += Environment.NewLine;
                     rtbMessages.Text += "A kind stranger must have brought you home." + Environment.NewLine;
                 }
@@ -363,14 +508,14 @@ namespace SuperAdventure
 
             _player.CurrentHP += potion.AmountToHeal;
 
-            if(_player.CurrentHP > _player.MaxHP)
+            if (_player.CurrentHP > _player.MaxHP)
             {
                 _player.CurrentHP = _player.MaxHP;
             }
 
-            foreach(InventoryItems ii in _player.Inventory)
+            foreach (InventoryItems ii in _player.Inventory)
             {
-                if(ii.Details.ID == potion.ID)
+                if (ii.Details.ID == potion.ID)
                 {
                     --ii.Quantity;
                     break;
@@ -391,7 +536,7 @@ namespace SuperAdventure
             {
                 rtbMessages.Text += Environment.NewLine;
                 rtbMessages.Text += "The " + _currentMonster.Name + " knocked you out." + Environment.NewLine;
-                MoveTo(World.LocationById(World.LOCATION_ID_HOME));
+                _moveTo(World.LocationById(World.LOCATION_ID_HOME));
                 rtbMessages.Text += Environment.NewLine;
                 rtbMessages.Text += "A kind stranger must have brought you home." + Environment.NewLine;
             }
@@ -402,10 +547,60 @@ namespace SuperAdventure
             BottomOut();
         }
 
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+            if (DialogResult.Yes == MessageBox.Show("This will overwrite any current save",
+                "Are you sure you want to save?", buttons))
+            {
+                SaveSystem.Save(_player);
+                rtbMessages.Text += "Game saved." + Environment.NewLine;
+                BottomOut();
+            }
+            else
+            {
+                rtbMessages.Text += "Save cancelled." + Environment.NewLine;
+                BottomOut();
+            }
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+            if (DialogResult.Yes == MessageBox.Show("This will delete your current save (progress won't be lost till program restart)",
+                "Are you sure you want to erase your save?", buttons))
+            {
+                SaveSystem.ResetSave();
+                rtbMessages.Text += "Save reset." + Environment.NewLine;
+                BottomOut();
+            }
+            else
+            {
+                rtbMessages.Text += "Reset cancelled." + Environment.NewLine;
+                BottomOut();
+            }
+        }
+
         private void BottomOut()
         {
             rtbMessages.SelectionStart = rtbMessages.Text.Length;
             rtbMessages.ScrollToCaret();
+        }
+
+        private void rdbtnOff_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdbtnOn.Checked)
+            {
+                _moveTo = AutoSaveMove;
+                rtbMessages.Text += "Auto-save enabled." + Environment.NewLine;
+                BottomOut();
+            }
+            else
+            {
+                _moveTo = NoSaveMove;
+                rtbMessages.Text += "Auto-save disabled." + Environment.NewLine;
+                BottomOut();
+            }
         }
     }
 }

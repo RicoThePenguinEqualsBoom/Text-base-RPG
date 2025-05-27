@@ -15,13 +15,14 @@
         public int RewardExP { get; set; }
         public List<LootItems> LootTable { get; set; }
 
+        public Monsters() : base(0, 0, "", "") { }
+
         public Monsters(int currentHP, int maxHP, int id, int maxDamage, int rewardExP, string name,
             string description) : base(currentHP, maxHP, name, description)
         {
             ID = id;
             MaxDamage = maxDamage;
             RewardExP = rewardExP;
-            Name = name;
             LootTable = [];
         }
     }

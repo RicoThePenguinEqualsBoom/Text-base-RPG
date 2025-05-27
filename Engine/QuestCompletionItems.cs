@@ -1,8 +1,16 @@
 ﻿namespace Engine
 {
-    public class QuestCompletionItems(int quantity, Items details)
+    public class QuestCompletionItems
     {
-        public int Quantity { get; set; } = quantity;
-        public Items Details { get; set; } = details;
+        public int Quantity { get; set; } 
+        public Items Details { get; set; } 
+
+        public QuestCompletionItems() { }
+
+        public QuestCompletionItems(int quantity, Items details)
+        {
+            Quantity = quantity;
+            Details = details;
+        }
     }
 }
