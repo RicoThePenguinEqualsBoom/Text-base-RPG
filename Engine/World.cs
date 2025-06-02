@@ -29,6 +29,7 @@
 
         public const int QUEST_ID_CLEAR_ALCHEMIST_GARDEN = 1;
         public const int QUEST_ID_CLEAR_FARMERS_FIELD = 2;
+        public const int QUEST_ID_CLEAR_SPIDER_FIELD = 3;
 
         public const int LOCATION_ID_HOME = 1;
         public const int LOCATION_ID_TOWN_SQUARE = 2;
@@ -52,7 +53,7 @@
         {
             Items.Add(new Weapons(ITEM_ID_RUSTY_SWORD, 2, 1, 5, "Rusty Sword", "Rusty Swords", "An old, rusty sword." +
                 " No amount of work could restore it to its previous grandeur."));
-            Items.Add(new Weapons(ITEM_ID_CLUB, 4, 3, 10, "Club", "Clubs", "A heavy wooden club. It feels comfortable to hold."));
+            Items.Add(new Weapons(ITEM_ID_CLUB, 4, 3, 10, "Club", "Clubs", "A nice and heavy wooden club. It feels comfortable in your hands."));
             Items.Add(new Items(ITEM_ID_RAT_TAIL, 1, "Rat Tail", "Rat Tails", "A tail cut from a rat. Maybe the Inn can use" +
                 " it for cheap meals."));
             Items.Add(new Items(ITEM_ID_PIECE_OF_FUR, 2, "Piece of fur", "Pieces of fur", "A piece of fur cut from a rat." +
@@ -111,8 +112,16 @@
 
             clearFarmersField.RewardItems = ItemByID(ITEM_ID_ADVENTURER_PASS);
 
+            Quests clearSpiderField = new(QUEST_ID_CLEAR_SPIDER_FIELD, 50, 35, "Clear the forest of spiders",
+                "Kill giant spiders in the forest. You will receive a nice club and 35 pieces of gold as a reward.");
+
+            clearSpiderField.QuestCompletionItems.Add(new QuestCompletionItems(3, ItemByID(ITEM_ID_SPIDER_SILK)));
+
+            clearSpiderField.RewardItems = ItemByID(ITEM_ID_CLUB);
+
             Quests.Add(clearAlchemistGarden);
             Quests.Add(clearFarmersField);
+            Quests.Add(clearSpiderField);
         }
 
         private static void PopulateLocations()
@@ -146,7 +155,11 @@
             };
 
             Locations guardPost = new(LOCATION_ID_GUARD_POST, "Guard post", "A, large, tough-looking guard is standing " +
-                "here. He looks bored.", ItemByID(ITEM_ID_ADVENTURER_PASS));
+                "here. He looks bored.")
+            {
+                ItemRequiredToEnter = ItemByID(ITEM_ID_ADVENTURER_PASS),
+                QuestsAvailableHere = QuestByID(QUEST_ID_CLEAR_SPIDER_FIELD)
+            };
 
             Locations bridge = new(LOCATION_ID_BRIDGE, "Bridge", "A stone bridge crosses a large river.");
 
