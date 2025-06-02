@@ -7,20 +7,20 @@ namespace SuperAdventure
         private readonly Player _player;
         private Monsters? _currentMonster;
         private MoveTo _moveTo;
+        private readonly SaveData _saveData = SaveSystem.Load();
+        private bool _autoSaveState;
 
         public SuperAdventure()
         {
             InitializeComponent();
 
-            rdbtnOff.Checked = true;
-
             _player = new Player(10, 10, 20, 0, "name", "You are you, nothing more, nothing less.");
             NoSaveMove(World.LocationById(World.LOCATION_ID_HOME));
             _player.Inventory.Add(new InventoryItems(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
 
-            if (SaveSystem.Load() != null)
+            if (_saveData != null)
             {
-                _player = SaveSystem.Load();
+                _player = _saveData.Player;
                 _player.CurrentLocation = World.LocationById(_player.CurrentLocation.ID);
 
                 foreach (var ii in _player.Inventory)
@@ -33,8 +33,15 @@ namespace SuperAdventure
                     pq.Details = World.QuestByID(pq.Details.ID);
                 }
 
+                _autoSaveState = _saveData.AutoSaveState;
+
+                rtbLocation.Text = _saveData.RichTextL;
+                rtbMessages.Text = _saveData.RichTextM;
+
                 NoSaveMove(_player.CurrentLocation);
             }
+
+            rdbtnOff.Checked = true;
 
             UpdatePlayerStats();
         }
@@ -302,7 +309,7 @@ namespace SuperAdventure
             UpdateWeaponList();
             UpdatePotionList();
             UpdatePlayerStats();
-            SaveSystem.Save(_player);
+            SaveSystem.Save(_player, rtbLocation.Text, rtbMessages.Text, _autoSaveState);
             BottomOut();
         }
 
@@ -553,7 +560,7 @@ namespace SuperAdventure
             if (DialogResult.Yes == MessageBox.Show("This will overwrite any current save",
                 "Are you sure you want to save?", buttons))
             {
-                SaveSystem.Save(_player);
+                SaveSystem.Save(_player, rtbLocation.Text, rtbMessages.Text, _autoSaveState);
                 rtbMessages.Text += "Game saved." + Environment.NewLine;
                 BottomOut();
             }
@@ -589,15 +596,19 @@ namespace SuperAdventure
 
         private void rdbtnOff_CheckedChanged(object sender, EventArgs e)
         {
-            if (rdbtnOn.Checked)
+            if (rdbtnOn.Checked || _autoSaveState == true)
             {
                 _moveTo = AutoSaveMove;
+                _autoSaveState = true;
+                rdbtnOn.Checked = true;
                 rtbMessages.Text += "Auto-save enabled." + Environment.NewLine;
+                rtbMessages.Text += "Save will occur on every use of the navigation buttons." + Environment.NewLine;
                 BottomOut();
             }
             else
             {
                 _moveTo = NoSaveMove;
+                _autoSaveState = false;
                 rtbMessages.Text += "Auto-save disabled." + Environment.NewLine;
                 BottomOut();
             }
