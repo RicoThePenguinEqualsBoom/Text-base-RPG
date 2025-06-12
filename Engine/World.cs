@@ -1,5 +1,6 @@
 ﻿namespace Engine
 {
+    // create all the items/monsters/quests/locations in the game
     public static class World
     {
         public static readonly List<Items> Items = [];
@@ -12,6 +13,7 @@
         public const Quests missingQu = null;
         public const Locations missingLo = null;
 
+        // Create IDs to access in an organized manner
         public const int ITEM_ID_RUSTY_SWORD = 1;
         public const int ITEM_ID_RAT_TAIL = 2;
         public const int ITEM_ID_PIECE_OF_FUR = 3;
@@ -51,6 +53,7 @@
 
         private static void PopulateItems()
         {
+            // Create all the items in the game 
             Items.Add(new Weapons(ITEM_ID_RUSTY_SWORD, 2, 1, 5, "Rusty Sword", "Rusty Swords", "An old, rusty sword." +
                 " No amount of work could restore it to its previous grandeur."));
             Items.Add(new Weapons(ITEM_ID_CLUB, 4, 3, 10, "Club", "Clubs", "A nice and heavy wooden club. It feels comfortable in your hands."));
@@ -74,6 +77,7 @@
 
         private static void PopulateMonsters()
         {
+            // Create all the monsters in the game
             Monsters rat = new(3, 3, MONSTER_ID_RAT, 5, 10, "Rat", "A, furry, rodent, pest." +
                 " Not dangerous to the average armed person but very annoying.");
             rat.LootTable.Add(new LootItems(ItemByID(ITEM_ID_RAT_TAIL), 100, false));
@@ -96,6 +100,7 @@
 
         private static void PopulateQuests()
         {
+            // Create all the quests in the game
             Quests clearAlchemistGarden = new(QUEST_ID_CLEAR_ALCHEMIST_GARDEN, 20, 10, "Clear the alchemist's" +
                 " garden", "Kill rats in the alchemist's garden. You will receive a healing potion" +
                 " and 20 gold pieces as a reward.");
@@ -126,6 +131,7 @@
 
         private static void PopulateLocations()
         {
+            // Create all the locations in the game
             Locations home = new(LOCATION_ID_HOME, "Home", "This is the house you grew up in." +
                 " You should really clean up sometime.");
 
@@ -205,6 +211,7 @@
             Locations.Add(spiderField);
         }
 
+        // Create methods to identify items/monsters/quests/locations by their IDs
         public static Items ItemByID(int id)
         {
             foreach(Items item in Items)
@@ -240,6 +247,7 @@
                     return quest;
                 }
             }
+
             return missingQu;
         }
 

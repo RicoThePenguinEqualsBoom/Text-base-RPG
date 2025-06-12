@@ -5,8 +5,10 @@ namespace Engine
 {
     public static class SaveSystem
     {
+        // Create the save file
         private static readonly string SaveFile = "SuperAdventure_save.json";
 
+        // Save all the relevant data
         public static void Save(Player player, string richTextL, string richTextM, bool autoSaveState)
         {
             SaveData saveData = new SaveData(player, richTextL, richTextM, autoSaveState);
@@ -21,8 +23,10 @@ namespace Engine
             File.WriteAllText(SaveFile, json);
         }
 
+        // Load any matching save data
         public static SaveData Load()
         {
+            // Check wether the save file exists
             if (!File.Exists(SaveFile))
             {
                 return null;
@@ -37,6 +41,7 @@ namespace Engine
             return JsonSerializer.Deserialize<SaveData>(json, options);
         }
 
+        // Reset the save file by deleting it
         public static void ResetSave()
         {
             if (File.Exists(SaveFile))

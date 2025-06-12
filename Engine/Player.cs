@@ -19,6 +19,7 @@
             ExP = exp;
         }
 
+        // Create all the methods pertaining exclusively to the player
         public bool HasRequiredItemToEnter(Locations location)
         {
             if(location.ItemRequiredToEnter == null)
